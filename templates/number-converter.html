@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Number Converter</h1>
+        <div class="input-group">
+            <label for="number">Number</label>
+            <input type="text" id="number">
+        </div>
+        <div class="input-group">
+            <label for="from_base">From Base</label>
+            <select id="from_base">
+                <option value="10">Decimal</option>
+                <option value="2">Binary</option>
+                <option value="8">Octal</option>
+                <option value="16">Hexadecimal</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="to_base">To Base</label>
+            <select id="to_base">
+                <option value="10">Decimal</option>
+                <option value="2">Binary</option>
+                <option value="8">Octal</option>
+                <option value="16">Hexadecimal</option>
+            </select>
+        </div>
+        <button onclick="convert()">Convert</button>
+        <div class="result" id="result"></div>
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        async function convert() {
+            const number = document.getElementById('number').value;
+            const from_base = document.getElementById('from_base').value;
+            const to_base = document.getElementById('to_base').value;
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+
+            resultDiv.innerText = '';
+            errorDiv.innerText = '';
+
+            const response = await fetch('/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ number, from_base, to_base })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                resultDiv.innerText = `Result: ${data.result}`;
+            } else {
+                errorDiv.innerText = `Error: ${data.error}`;
+            }
+        }
+    </script>
+</body>
+</html>
