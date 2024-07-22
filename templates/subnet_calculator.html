@@ -17,20 +17,21 @@
             <label for="slash_notation">Slash Notation</label>
             <input type="number" id="slash_notation">
         </div>
-        <div class="input-group">
-            <label for="subnet_name">Subnet Name</label>
-            <input type="text" id="subnet_name">
-        </div>
-        <div class="input-group">
-            <label for="subnet_size">Subnet Size</label>
-            <input type="number" id="subnet_size">
-        </div>
-        <button onclick="addSubnet()">Add Subnet</button>
+        <button onclick="addSubnet()">Add New Subnet</button>
         
-        <h2>Subnets</h2>
-        <ul id="subnet_list"></ul>
+        <table id="subnet_table">
+            <thead>
+                <tr>
+                    <th>Subnet Name</th>
+                    <th>Subnet Size</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="subnet_list">
+            </tbody>
+        </table>
 
-        <button onclick="calculateSubnets()">Calculate</button>
+        <button onclick="calculateSubnets()">Submit Query</button>
         <div class="result" id="result"></div>
         <div class="error" id="error"></div>
     </div>
@@ -39,8 +40,9 @@
         let subnets = [];
 
         function addSubnet() {
-            const subnetName = document.getElementById('subnet_name').value;
-            const subnetSize = document.getElementById('subnet_size').value;
+            const subnetTable = document.getElementById('subnet_table');
+            const subnetName = prompt('Enter Subnet Name:');
+            const subnetSize = prompt('Enter Subnet Size:');
 
             if (!subnetName || !subnetSize) {
                 alert('Please provide both subnet name and size.');
@@ -51,23 +53,40 @@
             subnets.push(subnet);
 
             const subnetList = document.getElementById('subnet_list');
-            const listItem = document.createElement('li');
-            listItem.textContent = `${subnet.name}: ${subnet.size}`;
-            listItem.dataset.index = subnets.length - 1;
-            listItem.onclick = () => removeSubnet(listItem.dataset.index);
-            subnetList.appendChild(listItem);
+            const row = subnetList.insertRow();
+            const nameCell = row.insertCell(0);
+            const sizeCell = row.insertCell(1);
+            const deleteCell = row.insertCell(2);
 
-            document.getElementById('subnet_name').value = '';
-            document.getElementById('subnet_size').value = '';
+            nameCell.innerHTML = subnet.name;
+            sizeCell.innerHTML = subnet.size;
+            deleteCell.innerHTML = `<button onclick="removeSubnet(${subnets.length - 1})">Remove</button>`;
+
+            row.dataset.index = subnets.length - 1;
         }
 
         function removeSubnet(index) {
             subnets.splice(index, 1);
             const subnetList = document.getElementById('subnet_list');
-            subnetList.removeChild(subnetList.children[index]);
-            for (let i = 0; i < subnetList.children.length; i++) {
-                subnetList.children[i].dataset.index = i;
-            }
+            subnetList.deleteRow(index);
+            updateSubnetList();
+        }
+
+        function updateSubnetList() {
+            const subnetList = document.getElementById('subnet_list');
+            subnetList.innerHTML = '';
+            subnets.forEach((subnet, index) => {
+                const row = subnetList.insertRow();
+                const nameCell = row.insertCell(0);
+                const sizeCell = row.insertCell(1);
+                const deleteCell = row.insertCell(2);
+
+                nameCell.innerHTML = subnet.name;
+                sizeCell.innerHTML = subnet.size;
+                deleteCell.innerHTML = `<button onclick="removeSubnet(${index})">Remove</button>`;
+
+                row.dataset.index = index;
+            });
         }
 
         async function calculateSubnets() {
