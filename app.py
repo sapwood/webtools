@@ -46,33 +46,33 @@ def convert():
     result = convert_number(number, from_base, to_base)
     return jsonify(result=result)
 
-@app.route('/subnet_calculator')
-def subnet_calculator():
-    return render_template('subnet_calculator.html')
+# @app.route('/subnet_calculator')
+# def subnet_calculator():
+#     return render_template('subnet_calculator.html')
 
-@app.route('/calculate_subnets', methods=['POST'])
-def calculate_subnets():
-    data = request.json
-    network_address = data['network_address']
-    slash_notation = int(data['slash_notation'])
-    subnets = data['subnets']
+# @app.route('/calculate_subnets', methods=['POST'])
+# def calculate_subnets():
+#     data = request.json
+#     network_address = data['network_address']
+#     slash_notation = int(data['slash_notation'])
+#     subnets = data['subnets']
 
-    try:
-        network = ipaddress.ip_network(f"{network_address}/{slash_notation}", strict=False)
-    except ValueError:
-        return jsonify(error="Invalid network address or slash notation"), 400
+#     try:
+#         network = ipaddress.ip_network(f"{network_address}/{slash_notation}", strict=False)
+#     except ValueError:
+#         return jsonify(error="Invalid network address or slash notation"), 400
 
-    calculated_subnets = []
-    for subnet in subnets:
-        subnet_size = int(subnet['size'])
-        subnet_prefix = 32 - subnet_size.bit_length() + 1
-        subnet_list = list(network.subnets(new_prefix=subnet_prefix))
-        if len(subnet_list) == 0:
-            return jsonify(error=f"Cannot create subnet with size {subnet_size}"), 400
-        calculated_subnets.append(str(subnet_list[0]))
-        network = list(network.address_exclude(subnet_list[0]))[0]
+#     calculated_subnets = []
+#     for subnet in subnets:
+#         subnet_size = int(subnet['size'])
+#         subnet_prefix = 32 - subnet_size.bit_length() + 1
+#         subnet_list = list(network.subnets(new_prefix=subnet_prefix))
+#         if len(subnet_list) == 0:
+#             return jsonify(error=f"Cannot create subnet with size {subnet_size}"), 400
+#         calculated_subnets.append(str(subnet_list[0]))
+#         network = list(network.address_exclude(subnet_list[0]))[0]
 
-    return jsonify(subnets=calculated_subnets)
+#     return jsonify(subnets=calculated_subnets)
 
 if __name__ == '__main__':
     app.run()
